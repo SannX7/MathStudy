@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f1a;--bg2:#161628;--bg3:#1e1e35;
+  --accent:#7c6cfa;--accent2:#fa6c9f;--accent3:#6cf4fa;
+  --gold:#fbbf24;--green:#4ade80;--red:#f87171;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --card:#1a1a2e;--border:#2d2d4e;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden}
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:white;animation:twinkle var(--d) ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.7}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(15,15,26,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;height:56px}
+.logo{font-weight:700;font-size:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:auto}
+.nav-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer;transition:.2s}
+.nav-btn:hover,.nav-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.game-btn{background:linear-gradient(135deg,#f59e0b,#ef4444);border:none;color:#fff;font-weight:600;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}50%{box-shadow:0 0 0 8px rgba(245,158,11,0)}}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:24px;position:relative;z-index:1}
+
+/* HOME */
+.hero{text-align:center;padding:60px 0 40px}
+.hero h1{font-size:clamp(32px,5vw,56px);font-weight:700;line-height:1.1;margin-bottom:16px}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--text2);font-size:18px;margin-bottom:40px}
+.subject-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:40px}
+.subject-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;cursor:pointer;transition:.3s;text-align:left;position:relative;overflow:hidden}
+.subject-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.subject-card.wajib::before{background:linear-gradient(90deg,var(--accent),var(--accent3))}
+.subject-card.ipa::before{background:linear-gradient(90deg,var(--accent2),var(--gold))}
+.subject-card:hover{transform:translateY(-4px);border-color:var(--accent)}
+.subject-card h3{font-size:18px;margin-bottom:8px}
+.subject-card p{color:var(--text2);font-size:14px;margin-bottom:16px}
+.topic-count{font-size:13px;color:var(--accent);font-weight:500}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:12px}
+.badge.wajib{background:rgba(124,108,250,.15);color:var(--accent)}
+.badge.ipa{background:rgba(250,108,159,.15);color:var(--accent2)}
+
+/* TOPICS */
+.page{display:none}
+.page.active{display:block}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text2);margin-bottom:24px}
+.breadcrumb span{cursor:pointer;transition:.2s}
+.breadcrumb span:hover{color:var(--accent)}
+.section-title{font-size:28px;font-weight:700;margin-bottom:8px}
+.section-sub{color:var(--text2);margin-bottom:24px}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.topic-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.3s}
+.topic-item:hover{border-color:var(--accent);background:rgba(124,108,250,.08)}
+.topic-item .icon{font-size:28px;margin-bottom:8px}
+.topic-item h4{font-size:15px;font-weight:600;margin-bottom:4px}
+.topic-item p{font-size:12px;color:var(--text2)}
+.topic-item .level{font-size:11px;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:8px;font-weight:500}
+.level.easy{background:rgba(74,222,128,.1);color:var(--green)}
+.level.med{background:rgba(251,191,36,.1);color:var(--gold)}
+.level.hard{background:rgba(248,113,113,.1);color:var(--red)}
+
+/* MATERI */
+.materi-container{display:grid;grid-template-columns:260px 1fr;gap:24px}
+.sidebar{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;height:fit-content;position:sticky;top:80px}
+.sidebar h4{font-size:14px;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.sidebar-item{padding:8px 12px;border-radius:8px;font-size:14px;cursor:pointer;transition:.2s;margin-bottom:4px}
+.sidebar-item:hover,.sidebar-item.active{background:rgba(124,108,250,.15);color:var(--accent)}
+.content-area{min-width:0}
+.content-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+.content-card h2{font-size:24px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.formula-box{background:rgba(124,108,250,.08);border:1px solid rgba(124,108,250,.3);border-radius:12px;padding:20px;margin:16px 0;font-family:'Fira Code',monospace;font-size:16px;text-align:center;color:#a78bfa}
+.tip-box{background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:12px;padding:16px;margin:16px 0}
+.tip-box .tip-label{color:var(--green);font-weight:600;font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.warning-box{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:16px;margin:16px 0}
+.warning-box .warn-label{color:var(--gold);font-weight:600;font-size:13px;margin-bottom:8px}
+.cara-cepat{background:linear-gradient(135deg,rgba(250,108,159,.1),rgba(124,108,250,.1));border:1px solid rgba(250,108,159,.3);border-radius:12px;padding:20px;margin:16px 0}
+.cara-cepat h4{color:var(--accent2);font-weight:700;font-size:15px;margin-bottom:12px}
+p.body{font-size:15px;line-height:1.8;color:var(--text2);margin-bottom:12px}
+.example-block{background:var(--bg3);border-radius:12px;padding:20px;margin:16px 0}
+.example-block h5{color:var(--accent3);font-size:14px;font-weight:600;margin-bottom:10px}
+.step{display:flex;gap:12px;margin-bottom:10px;font-size:14px;line-height:1.6;color:var(--text2)}
+.step-num{background:var(--accent);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.next-prev{display:flex;gap:12px;margin-top:24px}
+.btn{padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);font-family:inherit;font-size:14px;cursor:pointer;transition:.2s;font-weight:500}
+.btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:#6a5af9}
+
+/* GAME */
+.game-header{text-align:center;padding:40px 0 24px}
+.game-header h2{font-size:36px;font-weight:700;margin-bottom:8px}
+.game-stats{display:flex;justify-content:center;gap:32px;margin:20px 0}
+.stat-box{text-align:center}
+.stat-num{font-size:32px;font-weight:700}
+.stat-label{font-size:13px;color:var(--text2)}
+.score-color{color:var(--gold)}
+.combo-color{color:var(--accent2)}
+.lives{font-size:20px;letter-spacing:4px}
+.game-area{max-width:700px;margin:0 auto}
+.question-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden}
+.question-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.q-meta{font-size:13px;color:var(--text2);margin-bottom:12px}
+.q-text{font-size:20px;font-weight:600;line-height:1.5;margin-bottom:8px}
+.q-formula{font-family:'Fira Code',monospace;font-size:22px;color:var(--accent3);background:rgba(108,244,250,.08);border-radius:8px;padding:12px 20px;display:inline-block;margin-top:8px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.option{background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:16px;font-size:16px;font-weight:500;cursor:pointer;transition:.3s;font-family:inherit}
+.option:hover:not(:disabled){background:rgba(124,108,250,.15);border-color:var(--accent);transform:scale(1.02)}
+.option.correct{background:rgba(74,222,128,.15);border-color:var(--green);color:var(--green)}
+.option.wrong{background:rgba(248,113,113,.15);border-color:var(--red);color:var(--red)}
+.option:disabled{cursor:default}
+.progress-bar{height:6px;background:var(--bg3);border-radius:3px;margin-bottom:24px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .5s ease}
+.feedback{padding:16px;border-radius:12px;margin-top:16px;font-size:15px;font-weight:500;text-align:center}
+.feedback.correct{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.feedback.wrong{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.result-screen{text-align:center;padding:60px 20px}
+.result-emoji{font-size:80px;margin-bottom:16px}
+.result-score{font-size:64px;font-weight:700;color:var(--gold)}
+.result-msg{font-size:20px;color:var(--text2);margin:12px 0 32px}
+.timer{position:absolute;top:16px;right:20px;font-size:13px;color:var(--gold);font-family:'Fira Code',monospace;font-weight:600}
+.combo-badge{position:absolute;top:16px;left:20px;background:linear-gradient(135deg,var(--accent2),var(--gold));color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;display:none}
+.combo-badge.show{display:block;animation:popIn .3s ease}
+@keyframes popIn{0%{transform:scale(0)}100%{transform:scale(1)}}
+.topic-selector{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:24px}
+.topic-choice{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;text-align:center;transition:.3s;font-size:14px}
+.topic-choice:hover{border-color:var(--accent);background:rgba(124,108,250,.1)}
+.topic-choice.selected{border-color:var(--accent);background:rgba(124,108,250,.15);color:var(--accent)}
+.difficulty-btns{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.diff-btn{padding:8px 24px;border-radius:20px;border:1.5px solid var(--border);background:transparent;font-family:inherit;font-size:14px;cursor:pointer;color:var(--text2);transition:.2s}
+.diff-btn:hover,.diff-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(251,191,36,.1)}
+
+@media(max-width:768px){
+  .materi-container{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .options{grid-template-columns:1fr}
+  .game-stats{gap:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">∑ MathLab</div>
+    <button class="nav-btn active" onclick="showPage('home')">🏠 Home</button>
+    <button class="nav-btn" onclick="showPage('wajib-list')">📐 Mat. Wajib</button>
+    <button class="nav-btn" onclick="showPage('ipa-list')">🔬 Mat. IPA</button>
+    <button class="nav-btn game-btn" onclick="showPage('game-setup')">🎮 Game Mode</button>
+  </div>
+</nav>
+
+<div class="main">
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>Belajar Matematika<br><span>lebih asik, lebih paham</span></h1>
+    <p>Materi lengkap + cara cepat + game latsol interaktif 🚀</p>
+  </div>
+  <div class="subject-grid">
+    <div class="subject-card wajib" onclick="showPage('wajib-list')">
+      <div class="badge wajib">Matematika Wajib</div>
+      <h3>📐 Matematika Wajib</h3>
+      <p>Fungsi, trigonometri, limit, turunan, integral, statistika, dan lebih banyak lagi</p>
+      <div class="topic-count">10 topik lengkap →</div>
+    </div>
+    <div class="subject-card ipa" onclick="showPage('ipa-list')">
+      <div class="badge ipa">Matematika IPA</div>
+      <h3>🔬 Matematika Peminatan IPA</h3>
+      <p>Vektor, matriks, polinomial, persamaan lingkaran, transformasi, limit lanjutan</p>
+      <div class="topic-count">8 topik lengkap →</div>
+    </div>
+    <div class="subject-card" style="border-color:#f59e0b33;cursor:pointer" onclick="showPage('game-setup')">
+      <div class="badge" style="background:rgba(245,158,11,.15);color:#f59e0b">Game Mode</div>
+      <h3>🎮 Latihan Soal Game</h3>
+      <p>Jawab soal dalam waktu, kumpulkan poin, raih combo! Cara paling seru latihan soal</p>
+      <div class="topic-count" style="color:#f59e0b">Main sekarang →</div>
+    </div>
+  </div>
+</div>
+
+<!-- WAJIB LIST -->
+<div class="page" id="page-wajib-list">
+  <div class="breadcrumb"><span onclick="showPage('home')">Home</span> › Matematika Wajib</div>
+  <div class="section-title">📐 Matematika Wajib</div>
+  <div class="section-sub">Pilih topik yang mau kamu pelajari</div>
+  <div class="topic-grid" id="wajib-topics"></div>
+</div>
+
+<!-- IPA LIST -->
+<div class="page" id="page-ipa-list">
+  <div class="breadcrumb"><span onclick="showPage('home')">Home</span> › Matematika IPA</div>
+  <div class="section-title">🔬 Matematika Peminatan IPA</div>
+  <div class="section-sub">Pilih topik yang mau kamu pelajari</div>
+  <div class="topic-grid" id="ipa-topics"></div>
+</div>
+
+<!-- MATERI -->
+<div class="page" id="page-materi">
+  <div class="breadcrumb" id="materi-breadcrumb"></div>
+  <div class="materi-container">
+    <div class="sidebar" id="materi-sidebar"></div>
+    <div class="content-area" id="materi-content"></div>
+  </div>
+</div>
+
+<!-- GAME SETUP -->
+<div class="page" id="page-game-setup">
+  <div class="game-header">
+    <h2>🎮 Game Mode</h2>
+    <p style="color:var(--text2)">Pilih topik & difficulty, lalu buktiin kemampuanmu!</p>
+  </div>
+  <div class="game-area">
+    <div class="content-card">
+      <h3 style="margin-bottom:16px">Pilih Topik</h3>
+      <div class="topic-selector" id="game-topics"></div>
+      <h3 style="margin:20px 0 12px">Difficulty</h3>
+      <div class="difficulty-btns">
+        <button class="diff-btn active" onclick="setDiff(this,'easy')">⭐ Easy</button>
+        <button class="diff-btn" onclick="setDiff(this,'medium')">⭐⭐ Medium</button>
+        <button class="diff-btn" onclick="setDiff(this,'hard')">⭐⭐⭐ Hard</button>
+      </div>
+      <div style="text-align:center;margin-top:24px">
+        <button class="btn btn-primary" onclick="startGame()" style="padding:14px 40px;font-size:16px">🚀 Mulai Game!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME PLAY -->
+<div class="page" id="page-game">
+  <div class="game-header">
+    <h2>🎮 Math Battle</h2>
+    <div class="game-stats">
+      <div class="stat-box"><div class="stat-num score-color" id="g-score">0</div><div class="stat-label">Poin</div></div>
+      <div class="stat-box"><div class="stat-num combo-color" id="g-combo">0x</div><div class="stat-label">Combo</div></div>
+      <div class="stat-box"><div class="lives" id="g-lives">❤️❤️❤️</div><div class="stat-label">Nyawa</div></div>
+    </div>
+  </div>
+  <div class="game-area">
+    <div class="progress-bar"><div class="progress-fill" id="g-progress"></div></div>
+    <div id="g-question"></div>
+    <div id="g-result" style="display:none"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// === STARS ===
+(()=>{
+  const s=document.getElementById('stars');
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');
+    el.className='star';
+    const sz=Math.random()*2+1;
+    el.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;animation-delay:${Math.random()*4}s`;
+    s.appendChild(el);
+  }
+})();
+
+// === DATA ===
+const WAJIB_TOPICS=[
+  {id:'w1',icon:'📊',title:'Fungsi',desc:'Domain, kodomain, komposisi, invers',level:'easy',
+  sections:[
+    {id:'def',title:'Definisi Fungsi',content:`
+      <h2>📊 Fungsi</h2>
+      <p class="body">Fungsi adalah aturan yang menghubungkan setiap elemen di himpunan A (domain) dengan tepat satu elemen di himpunan B (kodomain).</p>
+      <div class="formula-box">f : A → B, ditulis f(x) = ...</div>
+      <p class="body"><strong style="color:var(--accent3)">Domain</strong> = himpunan nilai x yang boleh masuk<br>
+      <strong style="color:var(--accent3)">Kodomain</strong> = himpunan semua nilai y yang mungkin<br>
+      <strong style="color:var(--accent3)">Range</strong> = himpunan nilai y yang benar-benar dihasilkan</p>
+      <div class="tip-box"><div class="tip-label">💡 Ingat!</div>Satu nilai x hanya boleh punya SATU pasangan y. Tapi satu y boleh dipasangkan ke banyak x.</div>
+    `},
+    {id:'komposisi',title:'Komposisi Fungsi',content:`
+      <h2>🔗 Komposisi Fungsi</h2>
+      <p class="body">Komposisi fungsi adalah menggabungkan dua fungsi secara berurutan.</p>
+      <div class="formula-box">(f∘g)(x) = f(g(x))</div>
+      <p class="body">Baca: "f komposisi g" → masukkan g(x) dulu, hasilnya baru masuk ke f</p>
+      <div class="example-block">
+        <h5>✏️ Contoh Soal</h5>
+        <p style="color:var(--text2);margin-bottom:10px">Jika f(x) = 2x+1 dan g(x) = x², cari (f∘g)(3)!</p>
+        <div class="step"><div class="step-num">1</div><div>Hitung g(3) dulu → g(3) = 3² = 9</div></div>
+        <div class="step"><div class="step-num">2</div><div>Masukkan ke f → f(9) = 2(9)+1 = 19</div></div>
+        <div class="step"><div class="step-num">3</div><div>Jadi (f∘g)(3) = <strong style="color:var(--green)">19 ✓</strong></div></div>
+      </div>
+      <div class="cara-cepat">
+        <h4>⚡ CARA CEPAT</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Kalau (f∘g)(x) → dari kanan ke kiri! g dulu baru f.<br>Kalau diminta (f∘g)(x) bentuk aljabar: ganti semua x di f dengan g(x)</p>
+      </div>
+    `},
+    {id:'invers',title:'Fungsi Invers',content:`
+      <h2>🔄 Fungsi Invers</h2>
+      <p class="body">Invers fungsi f(x) ditulis f⁻¹(x). Fungsi invers "membalik" operasi fungsi asal.</p>
+      <div class="formula-box">Jika y = f(x), maka x = f⁻¹(y)</div>
+      <div class="example-block">
+        <h5>✏️ Cara Mencari Invers</h5>
+        <p style="color:var(--text2);margin-bottom:10px">Cari invers dari f(x) = 3x - 6</p>
+        <div class="step"><div class="step-num">1</div><div>Tulis y = 3x - 6</div></div>
+        <div class="step"><div class="step-num">2</div><div>Ubah posisi: cari x dalam y → 3x = y + 6 → x = (y+6)/3</div></div>
+        <div class="step"><div class="step-num">3</div><div>Ganti y dengan x → f⁻¹(x) = (x+6)/3</div></div>
+      </div>
+      <div class="cara-cepat">
+        <h4>⚡ CARA CEPAT</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Untuk f(x) = (ax+b)/(cx+d), inversnya langsung:<br>
+        f⁻¹(x) = (-dx+b)/(cx-a) → tuker a↔-d, trus balik!</p>
+      </div>
+    `}
+  ]},
+  {id:'w2',icon:'📐',title:'Trigonometri',desc:'Sudut, identitas, aturan sinus-cosinus',level:'med',
+  sections:[
+    {id:'rasio',title:'Rasio Trigonometri',content:`
+      <h2>📐 Rasio Trigonometri</h2>
+      <p class="body">Trigonometri mempelajari hubungan sudut dan sisi segitiga. Rasio dasar:</p>
+      <div class="formula-box">sin θ = depan/miring &nbsp;&nbsp; cos θ = samping/miring &nbsp;&nbsp; tan θ = depan/samping</div>
+      <div class="tip-box"><div class="tip-label">💡 Jembatan Keledai</div><strong style="font-size:16px">"SINDEMI COSAMIING TANDE-SAM"</strong><br>SIN = DEpan/MIring, COS = SAMping/MIring, TAN = DEpan/SAMping</div>
+      <div class="example-block">
+        <h5>📊 Nilai Sudut Istimewa</h5>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;font-family:'Fira Code',monospace">
+          <tr style="color:var(--accent3)"><td style="padding:8px">θ</td><td>0°</td><td>30°</td><td>45°</td><td>60°</td><td>90°</td></tr>
+          <tr style="color:var(--text2)"><td style="padding:8px;color:var(--accent)">sin</td><td>0</td><td>½</td><td>½√2</td><td>½√3</td><td>1</td></tr>
+          <tr style="color:var(--text2)"><td style="padding:8px;color:var(--accent)">cos</td><td>1</td><td>½√3</td><td>½√2</td><td>½</td><td>0</td></tr>
+          <tr style="color:var(--text2)"><td style="padding:8px;color:var(--accent)">tan</td><td>0</td><td>⅓√3</td><td>1</td><td>√3</td><td>∞</td></tr>
+        </table>
+      </div>
+      <div class="cara-cepat">
+        <h4>⚡ CARA CEPAT Hafal sin</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">sin 0°=√0/2, sin 30°=√1/2, sin 45°=√2/2, sin 60°=√3/2, sin 90°=√4/2<br>Polanya: <strong style="color:var(--accent2)">√0, √1, √2, √3, √4</strong> dibagi 2!</p>
+      </div>
+    `},
+    {id:'identitas',title:'Identitas Trigonometri',content:`
+      <h2>🔗 Identitas Trigonometri</h2>
+      <div class="formula-box">sin²θ + cos²θ = 1<br>1 + tan²θ = sec²θ<br>1 + cot²θ = csc²θ</div>
+      <div class="formula-box" style="margin-top:12px">sin(A+B) = sinA cosB + cosA sinB<br>cos(A+B) = cosA cosB - sinA sinB<br>tan(A+B) = (tanA+tanB)/(1-tanA tanB)</div>
+      <div class="formula-box" style="margin-top:12px">sin 2A = 2 sinA cosA<br>cos 2A = cos²A - sin²A = 1-2sin²A = 2cos²A-1</div>
+      <div class="cara-cepat">
+        <h4>⚡ CARA CEPAT cos 2A</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Kalau ketemu sin² → pakai cos 2A = 1 - 2sin²A → sin²A = (1-cos2A)/2<br>Kalau ketemu cos² → pakai cos 2A = 2cos²A - 1 → cos²A = (1+cos2A)/2</p>
+      </div>
+    `},
+    {id:'aturan',title:'Aturan Sinus & Cosinus',content:`
+      <h2>📏 Aturan Sinus & Cosinus</h2>
+      <p class="body">Digunakan untuk segitiga sembarang (bukan siku-siku)</p>
+      <div class="formula-box">ATURAN SINUS:<br>a/sin A = b/sin B = c/sin C = 2R</div>
+      <div class="formula-box" style="margin-top:12px">ATURAN COSINUS:<br>a² = b² + c² - 2bc cos A<br>cos A = (b²+c²-a²)/(2bc)</div>
+      <div class="tip-box"><div class="tip-label">💡 Kapan pakai yang mana?</div>
+      Aturan Sinus: ada pasangan sudut-sisi (A,a) dan (B,b)<br>
+      Aturan Cosinus: tahu 2 sisi + 1 sudut apit, atau tahu 3 sisi</div>
+    `}
+  ]},
+  {id:'w3',icon:'∞',title:'Limit',desc:'Limit fungsi, L\'Hopital, ketakhinggaan',level:'med',
+  sections:[
+    {id:'konsep',title:'Konsep Limit',content:`
+      <h2>∞ Konsep Limit</h2>
+      <p class="body">Limit adalah nilai yang didekati oleh suatu fungsi saat variabelnya mendekati suatu nilai tertentu.</p>
+      <div class="formula-box">lim[x→a] f(x) = L</div>
+      <p class="body">Artinya: saat x <em>mendekati</em> a (bukan sama dengan a), f(x) mendekati L</p>
+      <div class="warning-box"><div class="warn-label">⚠️ Bentuk Tak Tentu</div>0/0, ∞/∞, 0×∞, ∞-∞, 0⁰, 1^∞ → harus diselesaikan dulu!</div>
+      <div class="cara-cepat">
+        <h4>⚡ CARA CEPAT: Substitusi Langsung</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Step 1: Coba substitusi langsung x=a<br>→ Kalau hasilnya bilangan biasa → itu jawabannya!<br>→ Kalau dapet 0/0 → lanjut ke pemfaktoran atau L'Hopital</p>
+      </div>
+    `},
+    {id:'teknik',title:'Teknik Menghitung Limit',content:`
+      <h2>🔧 Teknik Limit</h2>
+      <div class="example-block">
+        <h5>1. Pemfaktoran (untuk 0/0)</h5>
+        <p style="color:var(--text2)">lim[x→2] (x²-4)/(x-2) → faktorkan → lim[x→2] (x+2)(x-2)/(x-2) = lim[x→2](x+2) = 4</p>
+      </div>
+      <div class="example-block">
+        <h5>2. Kali Sekawan (untuk bentuk akar)</h5>
+        <p style="color:var(--text2)">Kalau ada √a-√b → kali (√a+√b)/(√a+√b)</p>
+      </div>
+      <div class="example-block">
+        <h5>3. Limit x→∞ (polinomial)</h5>
+        <div class="formula-box" style="font-size:14px">Bagi semua dengan x^(pangkat tertinggi penyebut)</div>
+      </div>
+      <div class="cara-cepat">
+        <h4>⚡ CARA CEPAT Limit x→∞</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Bandingkan pangkat tertinggi pembilang (m) vs penyebut (n):<br>
+        • m < n → limit = 0<br>• m = n → limit = koef tertinggi atas / koef tertinggi bawah<br>• m > n → limit = ∞</p>
+      </div>
+    `}
+  ]},
+  {id:'w4',icon:'d/dx',title:'Turunan',desc:'Turunan fungsi, aturan rantai, aplikasi',level:'med',
+  sections:[
+    {id:'def',title:'Definisi Turunan',content:`
+      <h2>d/dx Turunan (Diferensial)</h2>
+      <p class="body">Turunan mengukur laju perubahan suatu fungsi.</p>
+      <div class="formula-box">f'(x) = lim[h→0] [f(x+h)-f(x)]/h</div>
+      <div class="formula-box" style="margin-top:12px">ATURAN DASAR:<br>d/dx [xⁿ] = n·xⁿ⁻¹<br>d/dx [sin x] = cos x<br>d/dx [cos x] = -sin x<br>d/dx [eˣ] = eˣ<br>d/dx [ln x] = 1/x</div>
+      <div class="cara-cepat">
+        <h4>⚡ Aturan Rantai (Chain Rule)</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">d/dx[f(g(x))] = f'(g(x)) · g'(x)<br>Contoh: d/dx[sin(3x)] = cos(3x) · 3 = 3cos(3x)</p>
+      </div>
+    `},
+    {id:'aplikasi',title:'Aplikasi Turunan',content:`
+      <h2>📈 Aplikasi Turunan</h2>
+      <div class="formula-box">Nilai maks/min: f'(x) = 0, cek f''(x)<br>f''(x) < 0 → maksimum<br>f''(x) > 0 → minimum</div>
+      <div class="example-block">
+        <h5>✏️ Soal Optimasi</h5>
+        <p style="color:var(--text2);margin-bottom:10px">Pagar keliling 40m, luas maksimum?</p>
+        <div class="step"><div class="step-num">1</div><div>Keliling: 2p+2l=40 → l=20-p</div></div>
+        <div class="step"><div class="step-num">2</div><div>Luas: L=p·l=p(20-p)=20p-p²</div></div>
+        <div class="step"><div class="step-num">3</div><div>dL/dp = 20-2p = 0 → p=10</div></div>
+        <div class="step"><div class="step-num">4</div><div>L maks = 10×10 = 100 m²</div></div>
+      </div>
+    `}
+  ]},
+  {id:'w5',icon:'∫',title:'Integral',desc:'Integral tak tentu dan tentu, luas daerah',level:'hard',
+  sections:[
+    {id:'dasar',title:'Integral Dasar',content:`
+      <h2>∫ Integral</h2>
+      <p class="body">Integral adalah operasi kebalikan dari turunan (anti-diferensial).</p>
+      <div class="formula-box">∫xⁿ dx = xⁿ⁺¹/(n+1) + C &nbsp; (n ≠ -1)<br>∫sin x dx = -cos x + C<br>∫cos x dx = sin x + C<br>∫eˣ dx = eˣ + C<br>∫1/x dx = ln|x| + C</div>
+      <div class="warning-box"><div class="warn-label">⚠️ Jangan lupa +C!</div>Integral tak tentu selalu ada konstanta C karena turunan dari konstanta = 0</div>
+      <div class="cara-cepat">
+        <h4>⚡ CARA CEPAT Integral Substitusi</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Kalau ada bentuk ∫f(g(x))·g'(x) dx → misal u=g(x), du=g'(x)dx<br>→ jadi ∫f(u) du → lebih mudah!</p>
+      </div>
+    `},
+    {id:'tentu',title:'Integral Tentu & Luas',content:`
+      <h2>📐 Integral Tentu & Luas Daerah</h2>
+      <div class="formula-box">∫[a→b] f(x) dx = F(b) - F(a)</div>
+      <p class="body">Luas daerah antara dua kurva:</p>
+      <div class="formula-box">L = ∫[a→b] |f(x) - g(x)| dx</div>
+      <div class="tip-box"><div class="tip-label">💡 Tips!</div>Kalau f(x) di atas g(x) di interval [a,b] → L = ∫[a→b] [f(x)-g(x)] dx (tanpa nilai mutlak)</div>
+    `}
+  ]},
+  {id:'w6',icon:'📈',title:'Statistika',desc:'Mean, median, modus, standar deviasi',level:'easy',
+  sections:[
+    {id:'ukuran',title:'Ukuran Pemusatan',content:`
+      <h2>📈 Ukuran Pemusatan Data</h2>
+      <div class="formula-box">Mean (x̄) = Σxᵢ/n<br>Median = nilai tengah (data terurut)<br>Modus = nilai yang paling sering muncul</div>
+      <div class="tip-box"><div class="tip-label">💡 Median Data Genap</div>Median = rata-rata dua nilai tengah. Contoh: data 6 nilai → rata-rata nilai ke-3 dan ke-4</div>
+      <div class="cara-cepat">
+        <h4>⚡ Cara Cepat Mean Data Kelompok</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">x̄ = Σ(fᵢ·xᵢ) / Σfᵢ<br>xᵢ = nilai tengah kelas, fᵢ = frekuensi kelas<br>Pakai metode coding untuk hitung lebih cepat!</p>
+      </div>
+    `},
+    {id:'sebaran',title:'Ukuran Sebaran',content:`
+      <h2>📊 Ukuran Sebaran Data</h2>
+      <div class="formula-box">Ragam (σ²) = Σ(xᵢ-x̄)²/n<br>Simpangan Baku (σ) = √ragam<br>Jangkauan = max - min<br>Kuartil: Q1, Q2, Q3</div>
+      <div class="cara-cepat">
+        <h4>⚡ Cara Cepat Standar Deviasi</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">σ² = (Σxᵢ²)/n - (x̄)²<br>Lebih efisien dari rumus panjang! Hitung rata² kuadrat minus kuadrat rata²</p>
+      </div>
+    `}
+  ]},
+  {id:'w7',icon:'🎲',title:'Peluang',desc:'Peluang kejadian, kombinatorial',level:'easy',
+  sections:[
+    {id:'dasar',title:'Dasar Peluang',content:`
+      <h2>🎲 Peluang</h2>
+      <div class="formula-box">P(A) = n(A)/n(S)</div>
+      <p class="body">n(A) = banyak kejadian A, n(S) = banyak ruang sampel</p>
+      <div class="formula-box">P(A∪B) = P(A)+P(B)-P(A∩B)<br>P(Aᶜ) = 1 - P(A)</div>
+      <div class="cara-cepat">
+        <h4>⚡ Kombinatorial Cepat</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Permutasi (urutan penting): P(n,r) = n!/(n-r)!<br>Kombinasi (urutan gak penting): C(n,r) = n!/[r!(n-r)!]<br>Ingat: C(n,r) = C(n, n-r) → pilih yg lebih kecil!</p>
+      </div>
+    `}
+  ]},
+  {id:'w8',icon:'📉',title:'Barisan & Deret',desc:'Aritmetika dan geometri',level:'easy',
+  sections:[
+    {id:'aritmetika',title:'Barisan Aritmetika',content:`
+      <h2>📉 Barisan Aritmetika</h2>
+      <p class="body">Barisan dengan selisih antar suku tetap (beda = b)</p>
+      <div class="formula-box">Uₙ = a + (n-1)b<br>Sₙ = n/2 · [2a + (n-1)b] = n/2 · (a + Uₙ)</div>
+      <div class="cara-cepat">
+        <h4>⚡ Cara Cepat</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Jumlah barisan aritmetika: kalau tahu suku pertama (a) dan terakhir (Uₙ)<br>Sₙ = n × (a + Uₙ)/2 → tinggal kali jumlah suku dengan rata-rata ujung!</p>
+      </div>
+    `},
+    {id:'geometri',title:'Barisan Geometri',content:`
+      <h2>🔺 Barisan Geometri</h2>
+      <p class="body">Barisan dengan rasio antar suku tetap (rasio = r)</p>
+      <div class="formula-box">Uₙ = a · rⁿ⁻¹<br>Sₙ = a(rⁿ-1)/(r-1) untuk r≠1<br>S∞ = a/(1-r) untuk |r| < 1</div>
+      <div class="tip-box"><div class="tip-label">💡 Deret Geometri Tak Hingga</div>S∞ hanya ada kalau |r| < 1 (konvergen). Kalau |r| ≥ 1 → divergen (tidak punya jumlah)</div>
+    `}
+  ]},
+];
+
+const IPA_TOPICS=[
+  {id:'i1',icon:'→',title:'Vektor',desc:'Operasi vektor, proyeksi, sudut antara vektor',level:'med',
+  sections:[
+    {id:'dasar',title:'Dasar Vektor',content:`
+      <h2>→ Vektor</h2>
+      <p class="body">Vektor adalah besaran yang punya besar dan arah. Ditulis sebagai kolom atau baris komponen.</p>
+      <div class="formula-box">a⃗ = (a₁, a₂, a₃) atau a₁i + a₂j + a₃k<br>|a⃗| = √(a₁²+a₂²+a₃²)</div>
+      <div class="formula-box" style="margin-top:12px">a⃗·b⃗ = a₁b₁+a₂b₂+a₃b₃ = |a||b|cos θ<br>cos θ = a⃗·b⃗ / (|a⃗|·|b⃗|)</div>
+      <div class="cara-cepat">
+        <h4>⚡ Cara Cepat Sudut Antara Vektor</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Hitung dot product → bagi dengan hasil kali panjang → arccos<br>Kalau dot product = 0 → vektor <strong style="color:var(--accent2)">tegak lurus!</strong></p>
+      </div>
+    `}
+  ]},
+  {id:'i2',icon:'[]',title:'Matriks',desc:'Operasi, determinan, invers matriks',level:'med',
+  sections:[
+    {id:'dasar',title:'Operasi Matriks',content:`
+      <h2>[] Matriks</h2>
+      <p class="body">Matriks adalah susunan bilangan dalam baris dan kolom.</p>
+      <div class="formula-box">Perkalian A×B: elemen c_ij = Σ aᵢₖ·bₖⱼ<br>(syarat: kolom A = baris B)</div>
+      <div class="formula-box" style="margin-top:12px">Determinan 2×2: det[a b; c d] = ad - bc<br>Invers: A⁻¹ = 1/det(A) · [d -b; -c a]</div>
+      <div class="cara-cepat">
+        <h4>⚡ Cara Cepat Invers 2×2</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Tuker a dan d (diagonal utama), kasih minus ke b dan c → bagi det(A)<br>Langsung hafalin polanya: [d -b; -c a] / (ad-bc)</p>
+      </div>
+    `}
+  ]},
+  {id:'i3',icon:'xⁿ',title:'Polinomial',desc:'Pembagian, teorema sisa, faktorisasi',level:'hard',
+  sections:[
+    {id:'dasar',title:'Polinomial',content:`
+      <h2>xⁿ Polinomial</h2>
+      <p class="body">Polinomial derajat n: f(x) = aₙxⁿ + aₙ₋₁xⁿ⁻¹ + ... + a₁x + a₀</p>
+      <div class="formula-box">Teorema Sisa: f(x) ÷ (x-a) → sisa = f(a)<br>Teorema Faktor: (x-a) faktor f(x) ↔ f(a)=0</div>
+      <div class="cara-cepat">
+        <h4>⚡ Cara Cepat Horner</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Pembagian sintetis (Horner) jauh lebih cepat dari pembagian biasa!<br>Untuk f(x) ÷ (x-a): tulis koefisien, lakukan step kali-tambah berulang dengan a</p>
+      </div>
+    `}
+  ]},
+  {id:'i4',icon:'⊙',title:'Lingkaran',desc:'Persamaan lingkaran, garis singgung',level:'med',
+  sections:[
+    {id:'persamaan',title:'Persamaan Lingkaran',content:`
+      <h2>⊙ Persamaan Lingkaran</h2>
+      <div class="formula-box">Bentuk Standar: (x-a)²+(y-b)²=r²<br>Pusat (a,b), jari-jari r<br><br>Bentuk Umum: x²+y²+Dx+Ey+F=0<br>Pusat: (-D/2, -E/2)<br>r = √(D²/4 + E²/4 - F)</div>
+      <div class="cara-cepat">
+        <h4>⚡ Garis Singgung di Titik (x₁,y₁)</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">x²+y²=r² → garis singgung: xx₁+yy₁=r²<br>(x-a)²+(y-b)²=r² → (x₁-a)(x-a)+(y₁-b)(y-b)=r²</p>
+      </div>
+    `}
+  ]},
+  {id:'i5',icon:'↔',title:'Transformasi',desc:'Translasi, rotasi, refleksi, dilatasi',level:'med',
+  sections:[
+    {id:'semua',title:'Semua Transformasi',content:`
+      <h2>↔ Transformasi Geometri</h2>
+      <div class="formula-box">Translasi T(a,b): (x,y) → (x+a, y+b)<br>Refleksi sb-x: (x,y) → (x,-y)<br>Refleksi sb-y: (x,y) → (-x,y)<br>Refleksi y=x: (x,y) → (y,x)<br>Rotasi 90°(+): (x,y) → (-y,x)<br>Rotasi 180°: (x,y) → (-x,-y)<br>Dilatasi [O,k]: (x,y) → (kx,ky)</div>
+      <div class="cara-cepat">
+        <h4>⚡ Hafal Rotasi Cepat</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Rotasi 90° berlawanan jarum jam: (x,y) → (-y,x) → ingat "x jadi y, y jadi -x berpindah"<br>Rotasi searah jam: (x,y) → (y,-x)</p>
+      </div>
+    `}
+  ]},
+  {id:'i6',icon:'∑',title:'Limit Lanjutan',desc:'L\'Hopital, limit trigonometri',level:'hard',
+  sections:[
+    {id:'lhopital',title:"L'Hopital & Limit Trigonometri",content:`
+      <h2>∑ Limit Lanjutan</h2>
+      <div class="formula-box">L'Hopital: lim f(x)/g(x) [0/0 atau ∞/∞] = lim f'(x)/g'(x)</div>
+      <div class="formula-box" style="margin-top:12px">lim[x→0] sin x/x = 1<br>lim[x→0] tan x/x = 1<br>lim[x→0] (1-cos x)/x² = 1/2</div>
+      <div class="cara-cepat">
+        <h4>⚡ Limit sin kx / x</h4>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">lim[x→0] sin(ax)/sin(bx) = a/b<br>lim[x→0] sin(ax)/(bx) = a/b<br>Langsung coret dan banding koefisiennya!</p>
+      </div>
+    `}
+  ]},
+];
+
+// === GAME QUESTIONS ===
+const QUESTIONS={
+  easy:[
+    {q:"Berapa nilai sin 30°?",a:"½",opts:["½","⅓√3","½√2","¼"],topic:"Trigonometri"},
+    {q:"Jika f(x)=3x+1, maka f(4)=?",a:"13",opts:["13","11","15","12"],topic:"Fungsi"},
+    {q:"Turunan dari f(x)=x³ adalah...",a:"3x²",opts:["3x²","x²","3x","x³"],topic:"Turunan"},
+    {q:"Suku ke-5 barisan 2,5,8,11,... adalah?",a:"14",opts:["14","12","16","15"],topic:"Barisan"},
+    {q:"P(A) = 0.3, maka P(Aᶜ) = ?",a:"0.7",opts:["0.7","0.3","0.4","0.6"],topic:"Peluang"},
+    {q:"Median dari data: 3,5,7,9,11 adalah?",a:"7",opts:["7","5","9","6"],topic:"Statistika"},
+    {q:"∫2x dx = ?",a:"x²+C",opts:["x²+C","2x²+C","x+C","2+C"],topic:"Integral"},
+    {q:"cos 0° = ?",a:"1",opts:["1","0","½","√2/2"],topic:"Trigonometri"},
+    {q:"lim[x→3](x+2) = ?",a:"5",opts:["5","3","2","7"],topic:"Limit"},
+    {q:"Invers f(x)=x+5 adalah?",a:"f⁻¹(x)=x-5",opts:["f⁻¹(x)=x-5","f⁻¹(x)=x+5","f⁻¹(x)=5-x","f⁻¹(x)=5x"],topic:"Fungsi"},
+  ],
+  medium:[
+    {q:"Nilai dari lim[x→2] (x²-4)/(x-2) = ?",a:"4",opts:["4","2","0","∞"],topic:"Limit"},
+    {q:"(f∘g)(x) jika f(x)=2x dan g(x)=x+3 adalah?",a:"2x+6",opts:["2x+6","2x+3","x+6","2x"],topic:"Fungsi"},
+    {q:"Turunan dari sin(3x) adalah?",a:"3cos(3x)",opts:["3cos(3x)","cos(3x)","-3cos(3x)","3sin(3x)"],topic:"Turunan"},
+    {q:"∫[0→2] x dx = ?",a:"2",opts:["2","4","1","0"],topic:"Integral"},
+    {q:"Determinan matriks [3,1;2,4] = ?",a:"10",opts:["10","14","8","6"],topic:"Matriks"},
+    {q:"Translasi T(3,-2): titik (1,4) → ?",a:"(4,2)",opts:["(4,2)","(3,6)","-2,6)","(4,-2)"],topic:"Transformasi"},
+    {q:"Nilai cos 2×30° = cos 60° = ?",a:"½",opts:["½","0","√3/2","1"],topic:"Trigonometri"},
+    {q:"Suku ke-n barisan geometri 3,6,12,... adalah?",a:"3·2ⁿ⁻¹",opts:["3·2ⁿ⁻¹","2·3ⁿ⁻¹","3ⁿ","2ⁿ⁺¹"],topic:"Barisan"},
+    {q:"lim[x→∞] (3x²+1)/(x²-2) = ?",a:"3",opts:["3","1","∞","0"],topic:"Limit"},
+    {q:"Nilai maksimum f(x)=-x²+4x ada di x=?",a:"2",opts:["2","-2","4","0"],topic:"Turunan"},
+  ],
+  hard:[
+    {q:"lim[x→0] sin(3x)/(2x) = ?",a:"3/2",opts:["3/2","2/3","3","1/2"],topic:"Limit"},
+    {q:"∫sin²x dx menggunakan identitas cos2x menghasilkan?",a:"x/2 - sin(2x)/4 + C",opts:["x/2 - sin(2x)/4 + C","x/2 + cos(2x)/4 + C","-cos²x + C","sin(2x)/2 + C"],topic:"Integral"},
+    {q:"Jika f(3)=7 dan f(x)=ax+b dan f⁻¹(1)=0, maka a+b=?",a:"5",opts:["5","7","4","3"],topic:"Fungsi"},
+    {q:"Vektor a=(2,-1,3), b=(1,2,-1). Dot product a·b=?",a:"-3",opts:["-3","3","7","1"],topic:"Vektor"},
+    {q:"sin(A+B) jika sin A=3/5 dan cos B=5/13 (A,B lancip) = ?",a:"56/65",opts:["56/65","33/65","16/65","63/65"],topic:"Trigonometri"},
+    {q:"Polinomial f(x)=x³-2x+1, sisa bagi (x-1) = ?",a:"0",opts:["0","1","-1","2"],topic:"Polinomial"},
+    {q:"Rotasi 90° berlawanan jarum: titik (3,4) → ?",a:"(-4,3)",opts:["(-4,3)","(4,-3)","-3,-4)","(4,3)"],topic:"Transformasi"},
+    {q:"lim[x→0] (1-cosx)/x² = ?",a:"1/2",opts:["1/2","1","0","2"],topic:"Limit"},
+  ]
+};
+
+// === PAGES ===
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(id==='home')document.querySelectorAll('.nav-btn')[0].classList.add('active');
+  if(id==='wajib-list')document.querySelectorAll('.nav-btn')[1].classList.add('active');
+  if(id==='ipa-list')document.querySelectorAll('.nav-btn')[2].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// Render topic lists
+function renderTopics(){
+  const wg=document.getElementById('wajib-topics');
+  WAJIB_TOPICS.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='topic-item';
+    d.innerHTML=`<div class="icon">${t.icon}</div><h4>${t.title}</h4><p>${t.desc}</p><span class="level ${t.level==='easy'?'easy':t.level==='med'?'med':'hard'}">${t.level==='easy'?'⭐ Mudah':t.level==='med'?'⭐⭐ Sedang':'⭐⭐⭐ Susah'}</span>`;
+    d.onclick=()=>openMateri(t,'wajib-list');
+    wg.appendChild(d);
+  });
+  const ig=document.getElementById('ipa-topics');
+  IPA_TOPICS.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='topic-item';
+    d.innerHTML=`<div class="icon">${t.icon}</div><h4>${t.title}</h4><p>${t.desc}</p><span class="level ${t.level==='easy'?'easy':t.level==='med'?'med':'hard'}">${t.level==='easy'?'⭐ Mudah':t.level==='med'?'⭐⭐ Sedang':'⭐⭐⭐ Susah'}</span>`;
+    d.onclick=()=>openMateri(t,'ipa-list');
+    ig.appendChild(d);
+  });
+}
+
+let currentTopic=null,currentSection=0,currentParent='';
+function openMateri(topic,parent){
+  currentTopic=topic;
+  currentSection=0;
+  currentParent=parent;
+  const bc=document.getElementById('materi-breadcrumb');
+  const label=parent==='wajib-list'?'Matematika Wajib':'Matematika IPA';
+  bc.innerHTML=`<span onclick="showPage('home')">Home</span> › <span onclick="showPage('${parent}')">${label}</span> › ${topic.title}`;
+  renderSidebar();
+  renderContent();
+  showPage('materi');
+}
+function renderSidebar(){
+  const s=document.getElementById('materi-sidebar');
+  s.innerHTML=`<h4>Subtopik</h4>`;
+  currentTopic.sections.forEach((sec,i)=>{
+    const d=document.createElement('div');
+    d.className='sidebar-item'+(i===currentSection?' active':'');
+    d.textContent=sec.title;
+    d.onclick=()=>{currentSection=i;renderSidebar();renderContent()};
+    s.appendChild(d);
+  });
+}
+function renderContent(){
+  const sec=currentTopic.sections[currentSection];
+  const total=currentTopic.sections.length;
+  const c=document.getElementById('materi-content');
+  let navHTML=`<div class="next-prev">`;
+  if(currentSection>0) navHTML+=`<button class="btn" onclick="navSection(-1)">← Sebelumnya</button>`;
+  if(currentSection<total-1) navHTML+=`<button class="btn btn-primary" onclick="navSection(1)">Berikutnya →</button>`;
+  navHTML+=`<button class="btn" onclick="showPage('game-setup')" style="margin-left:auto">🎮 Latihan Soal</button></div>`;
+  c.innerHTML=`<div class="content-card">${sec.content}</div>${navHTML}`;
+}
+function navSection(d){
+  currentSection+=d;
+  renderSidebar();
+  renderContent();
+}
+
+// === GAME ===
+let gameDiff='easy',selectedTopics=[],gameQs=[],gIdx=0,gScore=0,gCombo=0,gLives=3,gTimer=null,gTime=0;
+function setupGameTopics(){
+  const c=document.getElementById('game-topics');
+  c.innerHTML='';
+  const all=[...WAJIB_TOPICS,...IPA_TOPICS];
+  const topics=[...new Set(QUESTIONS.easy.concat(QUESTIONS.medium,QUESTIONS.hard).map(q=>q.topic))];
+  topics.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='topic-choice';
+    d.textContent=t;
+    d.onclick=()=>{d.classList.toggle('selected');toggleTopic(t)};
+    c.appendChild(d);
+  });
+  const allBtn=document.createElement('div');
+  allBtn.className='topic-choice selected';
+  allBtn.textContent='🎯 Semua Topik';
+  allBtn.onclick=()=>{
+    if(selectedTopics.length>0){selectedTopics=[];document.querySelectorAll('.topic-choice').forEach(d=>d.classList.remove('selected'));allBtn.classList.add('selected')}
+  };
+  c.insertBefore(allBtn,c.firstChild);
+}
+function toggleTopic(t){
+  const i=selectedTopics.indexOf(t);
+  if(i>-1)selectedTopics.splice(i,1);else selectedTopics.push(t);
+}
+function setDiff(btn,d){
+  gameDiff=d;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function startGame(){
+  const pool=gameDiff==='easy'?QUESTIONS.easy:gameDiff==='medium'?QUESTIONS.medium:QUESTIONS.hard;
+  gameQs=shuffle([...pool]).slice(0,10);
+  gIdx=0;gScore=0;gCombo=0;gLives=3;
+  showPage('game');
+  renderQuestion();
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function renderQuestion(){
+  if(gIdx>=gameQs.length||gLives<=0){endGame();return}
+  const q=gameQs[gIdx];
+  const timeLimit=gameDiff==='easy'?30:gameDiff==='medium'?20:15;
+  gTime=timeLimit;
+  clearInterval(gTimer);
+  updateStats();
+  const prog=((gIdx)/gameQs.length*100);
+  document.getElementById('g-progress').style.width=prog+'%';
+  const opts=shuffle([...q.opts]);
+  let optsHTML=opts.map(o=>`<button class="option" onclick="answer('${o.replace(/'/g,"\\'")}','${q.a.replace(/'/g,"\\'")}','${q.topic}')">${o}</button>`).join('');
+  document.getElementById('g-question').innerHTML=`
+    <div class="question-card">
+      <span class="timer" id="g-timer">${gTime}s</span>
+      ${gCombo>=2?`<span class="combo-badge show">🔥 ${gCombo}x COMBO!</span>`:''}
+      <div class="q-meta">Soal ${gIdx+1}/${gameQs.length} • ${q.topic}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${optsHTML}</div>
+    </div>`;
+  document.getElementById('g-result').style.display='none';
+  gTimer=setInterval(()=>{
+    gTime--;
+    const el=document.getElementById('g-timer');
+    if(el)el.textContent=gTime+'s';
+    if(gTime<=0){clearInterval(gTimer);timeUp()}
+  },1000);
+}
+function timeUp(){
+  gCombo=0;gLives--;
+  document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
+  showFeedback(false,'⏰ Waktu habis! -1 Nyawa');
+  setTimeout(()=>{gIdx++;renderQuestion()},1800);
+}
+function answer(chosen,correct,topic){
+  clearInterval(gTimer);
+  document.querySelectorAll('.option').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===correct)b.classList.add('correct');
+    else if(b.textContent===chosen&&chosen!==correct)b.classList.add('wrong');
+  });
+  const ok=chosen===correct;
+  if(ok){
+    gCombo++;
+    const bonus=gCombo>=3?50:gCombo>=2?20:0;
+    const points=10+Math.floor(gTime*2)+bonus;
+    gScore+=points;
+    showFeedback(true,`✅ Benar! +${points} poin${bonus>0?` (🔥 Combo +${bonus})`:''}`,`Waktu tersisa: ${gTime}s`);
+  }else{
+    gCombo=0;gLives--;
+    showFeedback(false,`❌ Salah! Jawaban: ${correct}`,'Nyawa -1');
+  }
+  updateStats();
+  setTimeout(()=>{gIdx++;renderQuestion()},2000);
+}
+function showFeedback(ok,msg,sub=''){
+  const el=document.getElementById('g-result');
+  el.style.display='block';
+  el.innerHTML=`<div class="feedback ${ok?'correct':'wrong'}">${msg}${sub?`<br><small>${sub}</small>`:''}</div>`;
+}
+function updateStats(){
+  document.getElementById('g-score').textContent=gScore;
+  document.getElementById('g-combo').textContent=gCombo+'x';
+  const hearts='❤️'.repeat(gLives)+'🖤'.repeat(3-gLives);
+  document.getElementById('g-lives').textContent=hearts;
+}
+function endGame(){
+  clearInterval(gTimer);
+  const pct=Math.round((gScore/(gameQs.length*(10+15+20)))*100);
+  const msg=gScore>=200?'🏆 LUAR BIASA!':gScore>=100?'🎉 Bagus banget!':'💪 Terus berlatih!';
+  document.getElementById('g-question').style.display='none';
+  document.getElementById('g-result').style.display='none';
+  const area=document.querySelector('#page-game .game-area');
+  area.innerHTML=`
+    <div class="result-screen">
+      <div class="result-emoji">${gScore>=200?'🏆':gScore>=100?'🎉':'💪'}</div>
+      <div class="result-score">${gScore}</div>
+      <div style="font-size:14px;color:var(--text2);margin:4px 0 8px">POIN TOTAL</div>
+      <div class="result-msg">${msg}</div>
+      <div style="display:flex;gap:32px;justify-content:center;margin-bottom:32px">
+        <div class="stat-box"><div class="stat-num" style="color:var(--accent3)">${gameQs.length-Math.max(0,3-gLives-gCombo)}</div><div class="stat-label">Benar</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--accent)">Q${gIdx}</div><div class="stat-label">Soal Dijawab</div></div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="startGame()">🔄 Main Lagi</button>
+        <button class="btn" onclick="showPage('game-setup')">⚙️ Ganti Setting</button>
+        <button class="btn" onclick="showPage('home')">🏠 Home</button>
+      </div>
+    </div>`;
+}
+
+// Init
+renderTopics();
+setupGameTopics();
+</script>
+</body>
+</html>
